@@ -1,10 +1,11 @@
 from schema_parser.base import BaseField
 from typing import Dict
+
 class Table:
-    def __init__(self, name:str, fields:dict[str,BaseField],mock=True):
+    def __init__(self, name:str, fields:dict[str,BaseField],parser):
         self.name = name
         self.fields = fields
-        self.build_mock = mock
+        self.parser = parser
 
 
     def __str__(self):

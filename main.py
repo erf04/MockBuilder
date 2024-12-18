@@ -1,5 +1,5 @@
 from schema_parser.parser import SchemaParser
-from sql_generator.generator import CreateTableGenerator,RelationGenerator
+from sql_generator.generator import DDLGenerator
 import mysql.connector
 schema = {
     "tables": {
@@ -42,15 +42,17 @@ schema = {
 
 parser = SchemaParser(schema)
 tables = parser.parse()
-# connection = mysql.connector.connect(
-#     host="localhost",
-#     user="root",
-#     password="1234",
-#     database="test"
-# )
-for table in tables.values():
-    print(CreateTableGenerator(connection=None,parser=parser,table=table).gen())
-    print(RelationGenerator(connection=None,parser=parser,table=table).gen())
+connection = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="1234",
+    database="test",
+    port = 3307
+)
+print(connection.is_connected())
+ddl_generator = DDLGenerator(connection=connection,parser=parser)
+print(ddl_generator.gen())
+ddl_generator.emit()
 
 # print(SQLConvertor(parser).connection)
 # print(tables)

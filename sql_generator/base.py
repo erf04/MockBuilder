@@ -3,19 +3,22 @@ from schema_parser.parser import SchemaParser
 
 
 class SQLGenerator:
-    def __init__(self,connection,parser:SchemaParser, table:Table):
-        self.table = table
+    def __init__(self,connection, parser:SchemaParser):
+        # self.table = table
         self.parser = parser
         self.connection = connection
-        # self.curser = connection.cursor()
+        self.cursor = connection.cursor()
 
 
     def emit(self):
-        self.cursor.execute(self.gen())
-        self.connection.commit()
+        sql_str = self.gen()
+        commands = sql_str.split(";")
+        for command in commands:
+            self.cursor.execute(command)
+            self.connection.commit()
 
 
-    def gen(self):
+    def gen(self)->str:
         return NotImplementedError("Subclasses must implement this method.")
     
     
@@ -25,4 +28,5 @@ class SQLGenerator:
     
     def __repr__(self):
         return self.gen()
+
     

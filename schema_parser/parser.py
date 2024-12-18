@@ -28,7 +28,7 @@ class SchemaParser:
                 fields[field_name] = field_class(field_name,**field_args)
 
             # Instantiate the table
-            self.tables[table_name] = Table(name=table_name, fields=fields)
+            self.tables[table_name] = Table(name=table_name, fields=fields,parser=self)
             
 
         return self.tables

@@ -1,16 +1,25 @@
 from schema_parser.fields import IntegerField, StringField, DateField
 from schema_parser.table import Table
 from .base import SQLGenerator
-from schema_parser.base import BaseField
 
-class CreateTableGenerator(SQLGenerator):
+class DDLGenerator(SQLGenerator):
 
     def gen(self):
+        sql_str = ""
+        for _,table_obj in self.parser.get_tables().items():
+            sql_str += self.create_table(table_obj)
+        # print(sql_str)
+        for _,table_obj in self.parser.get_tables().items():
+            sql_str += self.handle_relations(table_obj)
+        return sql_str
+    
+
+    def create_table(self,table:Table):
         """
         Generate a CREATE TABLE SQL statement for a given Table object.
         """
         field_definitions = []
-        for field_name, field_obj in self.table.fields.items():
+        for field_name, field_obj in table.fields.items():
             # Map custom fields to SQL types
             sql_str = None
             if isinstance(field_obj, IntegerField):
@@ -28,19 +37,17 @@ class CreateTableGenerator(SQLGenerator):
 
         # Join field definitions and construct the CREATE TABLE SQL
         fields_sql = ", ".join(field_definitions)
-        return f"CREATE TABLE {self.table.name} ({fields_sql});"
+        return f"CREATE TABLE {table.name} ({fields_sql});"
     
 
-class RelationGenerator(SQLGenerator):
-
-    def gen(self):
+    def handle_relations(self,table:Table):
         sql_str = ""
         # print(self.table.fields)
-        for field_name, field_obj in self.table.fields.items():
+        for field_name, field_obj in table.fields.items():
             if field_obj.refrence!=None:
-                table:Table = self.parser.get_table(field_obj.refrence)
+                refrence_table:Table = self.parser.get_table(field_obj.refrence)
                 related_field = table.get_primary_key()
-                sql_str += f"ALTER TABLE {self.table.name} ADD FOREIGN KEY ({field_name}) REFERENCES {table.name}({related_field});"
-
+                sql_str += f"ALTER TABLE {table.name} ADD FOREIGN KEY ({field_name}) REFERENCES {refrence_table.name}({related_field});"
+    
         return sql_str
 
