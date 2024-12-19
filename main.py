@@ -43,8 +43,7 @@ schema = {
 }
 
 
-parser = SchemaParser(schema)
-tables = parser.parse()
+parser = SchemaParser(schema).parse()
 connection = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -54,10 +53,11 @@ connection = mysql.connector.connect(
 )
 # print(connection.is_connected())
 ddl_generator = DDLGenerator(connection=connection,parser=parser)
-print(list(tables.keys()))
+# print(list(tables.keys()))
 # ddl_generator.emit()
-mocks = MockBuilder(parser=parser).build()
+mocks = MockBuilder(parser=parser).build_sql_commands()
 print(mocks)
+ddl_generator.emit(sql_command="".join(mocks))
 
 # print(SQLConvertor(parser).connection)
 # print(tables)

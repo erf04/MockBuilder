@@ -8,7 +8,7 @@ class SchemaParser:
         self.tables:Dict[str,Table] = {}
 
 
-    def parse(self) ->dict:
+    def parse(self):
         """
         Parse the schema and instantiate Table objects.
         """
@@ -32,13 +32,13 @@ class SchemaParser:
             self.tables[table_name] = Table(name=table_name, fields=fields,parser=self,**kwargs)
             
 
-        return self.tables
+        return self
     
 
     def get_tables(self) -> dict:
         return self.tables
     
-    def get_table(self, table_name) -> Table:
+    def get_table(self, table_name:str) -> Table:
         return self.tables.get(table_name) if self.tables!={} else None
     
 

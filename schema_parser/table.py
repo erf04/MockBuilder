@@ -21,3 +21,11 @@ class Table:
         for field_name, field_obj in self.fields.items():
             if field_obj.is_primary_key:
                 return field_name
+            
+
+    def has_foreign_key(self):
+        for field_name, field_obj in self.fields.items():
+            if field_obj.refrence:
+                return True
+            
+        return False

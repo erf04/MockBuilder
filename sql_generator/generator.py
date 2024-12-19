@@ -1,7 +1,7 @@
 from schema_parser.fields import IntegerField, StringField, DateField
 from schema_parser.table import Table
 from .base import SQLGenerator
-
+from mock_builder.builder import MockBuilder
 class DDLGenerator(SQLGenerator):
 
     def gen(self):
@@ -23,8 +23,8 @@ class DDLGenerator(SQLGenerator):
             # Map custom fields to SQL types
             sql_str = None
             if isinstance(field_obj, IntegerField):
-                sql_type = "INTEGER"
-                sql_pk = "PRIMARY KEY" if field_obj.is_primary_key else ""
+                sql_type = "INT"
+                sql_pk = "AUTO_INCREMENT PRIMARY KEY" if field_obj.is_primary_key else ""
                 sql_str = f"{sql_type} {sql_pk}"
             elif isinstance(field_obj, StringField):
                 sql_str = "TEXT"
@@ -37,6 +37,7 @@ class DDLGenerator(SQLGenerator):
 
         # Join field definitions and construct the CREATE TABLE SQL
         fields_sql = ", ".join(field_definitions)
+        print(fields_sql)
         return f"CREATE TABLE {table.name} ({fields_sql});"
     
 
@@ -50,4 +51,23 @@ class DDLGenerator(SQLGenerator):
                 sql_str += f"ALTER TABLE {table.name} ADD FOREIGN KEY ({field_name}) REFERENCES {refrence_table.name}({related_field});"
     
         return sql_str
+    
+
+
+class MockInsertGenerator(SQLGenerator):
+    def __init__(self, connection , mockBuilder:MockBuilder):
+        super.__init__(connection,mockBuilder.parser)
+        self.mock_builder = mockBuilder
+
+
+    def gen(self):
+        mocks = self.mock_builder.build()
+        sql_str = ""
+        for table_name,mock_data in mocks.items():
+            for mock in mock_data:
+                sql_str += f"INSERT INTO {table_name} VALUES ({','.join(mock)});"
+                # self.emit(sql_str)
+        return sql_str
+
+
 
