@@ -1,7 +1,6 @@
 from schema_parser.table import Table
 from schema_parser.parser import SchemaParser
 
-
 class SQLGenerator:
     def __init__(self,connection, parser:SchemaParser):
         # self.table = table
@@ -10,8 +9,8 @@ class SQLGenerator:
         self.cursor = connection.cursor()
 
 
-    def emit(self):
-        sql_str = self.gen()
+    def emit(self,sql_command:str=None):
+        sql_str = self.gen() if not sql_command else sql_command 
         commands = sql_str.split(";")
         for command in commands:
             self.cursor.execute(command)

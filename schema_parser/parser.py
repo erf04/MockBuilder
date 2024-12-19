@@ -1,10 +1,11 @@
 from schema_parser.table import Table
 from schema_parser.mapper import FIELD_TYPE_MAPPING
 from schema_parser.base import BaseField
+from typing import Dict
 class SchemaParser:
     def __init__(self, schema:dict):
         self.schema = schema
-        self.tables = {}
+        self.tables:Dict[str,Table] = {}
 
 
     def parse(self) ->dict:
@@ -24,11 +25,11 @@ class SchemaParser:
 
                 # Instantiate the field class
                 field_args = {k: v for k, v in field_data.items() if k != "type"}
-                print(field_args)
+                # print(field_args)
                 fields[field_name] = field_class(field_name,**field_args)
-
+            kwargs = {k: v for k, v in table_data.items() if k != "fields"}
             # Instantiate the table
-            self.tables[table_name] = Table(name=table_name, fields=fields,parser=self)
+            self.tables[table_name] = Table(name=table_name, fields=fields,parser=self,**kwargs)
             
 
         return self.tables

@@ -1,6 +1,7 @@
 from schema_parser.parser import SchemaParser
 from sql_generator.generator import DDLGenerator
 import mysql.connector
+from mock_builder.builder import MockBuilder
 schema = {
     "tables": {
         "users": {
@@ -16,7 +17,8 @@ schema = {
                     "type": "string"
 
                 }
-            }
+            },
+            "mock_count":10
         },
         "posts": {
             "fields": {
@@ -34,7 +36,8 @@ schema = {
                     "type": "integer",
                     "refrences": "users"
                 }
-            }
+            },
+            "mock_count":10
         }
     }
 }
@@ -49,10 +52,12 @@ connection = mysql.connector.connect(
     database="test",
     port = 3307
 )
-print(connection.is_connected())
+# print(connection.is_connected())
 ddl_generator = DDLGenerator(connection=connection,parser=parser)
-print(ddl_generator.gen())
-ddl_generator.emit()
+print(list(tables.keys()))
+# ddl_generator.emit()
+mocks = MockBuilder(parser=parser).build()
+print(mocks)
 
 # print(SQLConvertor(parser).connection)
 # print(tables)
