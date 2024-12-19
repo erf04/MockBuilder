@@ -4,16 +4,19 @@ from schema_parser import fields
 from schema_parser.base import BaseField
 from schema_parser.parser import SchemaParser
 from typing import Dict,List
+from .mapper import MOCK_TYPE_MAPPING
+import csv
 class MockBuilder:
 
     def __init__(self,parser:SchemaParser):
         self.mocks = []
         self.parser:SchemaParser = parser
         # self.table = table
-        self.faker = Faker()
         self.final_str = ""
-        self.__fk_dict:Dict[str,List[str]] = {}
-        self.__non_fk_dict : Dict[str,List[str]] = {}
+        self._fk_dict:Dict[str,List[str]] = {}
+        self._non_fk_dict : Dict[str,List[str]] = {}
+        self._tables_dict : Dict[str,List[str]] = {}
+        
 
 
 
@@ -30,10 +33,8 @@ class MockBuilder:
             if not field_obj.refrence:
                 if field_obj.is_primary_key:
                     pass
-                elif isinstance(field_obj,fields.IntegerField):
-                    values.append(str(self.faker.random_int()))
-                elif isinstance(field_obj,fields.StringField):
-                    values.append(f"'{self.faker.word()}'")
+                else:
+                    values.append(self.generate_random_value(field_obj))
         return values
     
 
@@ -69,14 +70,38 @@ class MockBuilder:
         for field_name,field_obj in table.fields.items():
             if field_obj.refrence:
                 refrence_table = self.parser.get_table(field_obj.refrence)
-                values.append(str(self.faker.random_int(min=1,max=refrence_table.mock_count)))
+                values.append(self.generate_random_value(field_obj,min=1,max=refrence_table.mock_count))
         return values
     
+    def generate_random_value(self,field_obj:BaseField,**kwargs):
+        return MOCK_TYPE_MAPPING[field_obj.__class__](**kwargs)
+    
+
+    def register_mock_field(self,field_class:BaseField,fake_function):
+        MOCK_TYPE_MAPPING[field_class.__class__] = fake_function
+        
 
     def get_base_update_sql(self,table:Table):
         base_str = ""
         base_str = f"UPDATE {table.name}"
         return base_str
+    
+
+    def get_full_values(self,table:Table):
+        values = []
+        for field_name,field_obj in table.fields.items():
+            if field_obj.is_primary_key:
+                pass
+            elif field_obj.refrence:
+                refrence_table = self.parser.get_table(field_obj.refrence)
+                values.append(self.generate_random_value(field_obj,min=1,max=refrence_table.mock_count))
+            else:
+                values.append(self.generate_random_value(field_obj))
+        return values
+    
+
+    
+
 
     def build_fk_fields(self,table:Table,pk:int):
         fk_fields = self.get_fk_fields(table)
@@ -106,7 +131,7 @@ class MockBuilder:
                         value.append(self.build_non_fk_fields(table_obj))
                     else:
                         final_data[table_obj.name] = [self.build_non_fk_fields(table_obj)]
-        self.__non_fk_dict = final_data
+        self._non_fk_dict = final_data
         return self
     
 
@@ -121,7 +146,7 @@ class MockBuilder:
                             value.append(self.build_fk_fields(table_obj,pk))
                         else:
                             final_data[table_obj.name] = [self.build_fk_fields(table_obj,pk)]
-        self.__fk_dict = final_data
+        self._fk_dict = final_data
         return final_data
     
 
@@ -129,13 +154,29 @@ class MockBuilder:
         self.build_non_fk_mock()
         self.update_for_fk_mock()
         final =""
-        for key,value in self.__non_fk_dict.items():
+        for key,value in self._non_fk_dict.items():
             for sql_str in value:
                 final+=sql_str
-        for key,value in self.__fk_dict.items():
+        for key,value in self._fk_dict.items():
             for sql_str in value:
                 final+=sql_str
         return final
+    
+
+    def build_csv(self,folder_path:str):
+        data:Dict[Table,List[str]] = {}
+        for table_name,table_obj in self.parser.tables.items():
+            data[table_obj]=[]
+            if table_obj.mock_count > 0:
+                for pk in range(1,table_obj.mock_count+1):
+                    data[table_obj].append(self.get_full_values(table_obj))
+
+        ## Generate CSV            
+        for table, rows in data.items():
+            with open(f"{folder_path}/{table}.csv", "w", newline="") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(table.get_fields_except_primary_key())  # Header
+                writer.writerows(rows)# Rows
 
     
 

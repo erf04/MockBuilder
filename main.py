@@ -57,7 +57,7 @@ ddl_generator = DDLGenerator(connection=connection,parser=parser)
 # ddl_generator.emit()
 mocks = MockBuilder(parser=parser).build_sql_commands()
 print(mocks)
-ddl_generator.emit(sql_command="".join(mocks))
+# ddl_generator.emit(sql_command="".join(mocks))
 
 # print(SQLConvertor(parser).connection)
 # print(tables)

@@ -29,3 +29,11 @@ class Table:
                 return True
             
         return False
+    
+
+    def get_fields_except_primary_key(self):
+        fields = []
+        for field_name, field_obj in self.fields.items():
+            if not field_obj.is_primary_key:
+                fields.append(field_name)
+        return fields
