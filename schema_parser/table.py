@@ -10,7 +10,7 @@ class Table:
 
 
     def __str__(self):
-        return f"table {self.name}"
+        return f"table-{self.name}"
     
 
     def __repr__(self):

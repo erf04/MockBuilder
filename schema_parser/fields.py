@@ -1,5 +1,6 @@
 from .base import BaseField
 from datetime import datetime
+from faker import Faker
 class IntegerField(BaseField):
 
     def __str__(self):
@@ -7,11 +8,13 @@ class IntegerField(BaseField):
     
     def __repr__(self):
         return f"IntegerField({self.name})"
+     
+
+    def get_sql_type(self):
+        return "INTEGER"
     
-    def validate(self,value):
-        if type(value) == int:
-            return value
-        raise ValueError(f"Invalid value type for {self.name}: {type(value)}. Expected type: int")
+    def fake(self,**kwargs):
+        return Faker().random_int(**kwargs)
     
 
 class StringField(BaseField):
@@ -22,32 +25,27 @@ class StringField(BaseField):
     def __repr__(self):
         return f"StringField({self.name})"
     
-    def validate(self,value):
-        if type(value) == str:
-            return value
-        raise ValueError(f"Invalid value type for {self.name}: {type(value)}. Expected type: str")
 
+    def get_sql_type(self):
+        return "VARCHAR(255)"
 
-class DateTimeField:
+    def fake(self,**kwargs):
+        return Faker().name(**kwargs)
 
-    def __init__(self,name:str,format:str):
-        self.name = name.strip()
-        self.format = format.strip()
-        # self.value = self.validate(value)
+class DateTimeField(BaseField):
 
     def __str__(self):
         return self.name
-
-
     
-    def validate(self,value):
-        try:
-            # Try parsing the date
-            parsed_date = datetime.strptime(value, self.format)
-            return parsed_date
-        except ValueError as e:
-            # Raise an error if the date is invalid
-            raise ValueError(f"Invalid date: {value}. Expected format: {self.format}")
+    def get_sql_type(self):
+        return "TIMESTAMP"
+    
+    def fake(self,**kwargs):
+        return Faker().date_time(**kwargs)
+
+
+
+        
 
 class BooleanField(BaseField):
 
@@ -57,16 +55,30 @@ class BooleanField(BaseField):
     def __repr__(self):
         return f"BooleanField({self.name})"
     
-
-    def validate(self,value):
-        if type(value) == bool:
-            return value
-        raise ValueError(f"Invalid value type for {self.name}: {type(value)}. Expected type: bool")
+    
+    def get_sql_type(self):
+        return "BOOLEAN"
+    
+    def fake(self,**kwargs):
+        return Faker().boolean(**kwargs)
     
 
 
-class DateField(DateTimeField):
-    pass
+class DateField(BaseField):
+    def get_sql_type(self):
+        return "DATE"
+    
+    def fake(self,**kwargs):
+        return Faker().date(**kwargs)
+    
+
+
+class EmailField(StringField):
+    
+    def get_sql_type(self):
+        return "NVARCHAR(255)"
+    def fake(self,**kwargs):
+        return Faker().email(**kwargs)  
 
 
     

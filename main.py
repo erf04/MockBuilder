@@ -2,6 +2,8 @@ from schema_parser.parser import SchemaParser
 from sql_generator.generator import DDLGenerator
 import mysql.connector
 from mock_builder.builder import MockBuilder
+from schema_parser.fields import EmailField
+from faker import Faker
 schema = {
     "tables": {
         "users": {
@@ -14,11 +16,18 @@ schema = {
                     "type": "string"
                 },
                 "email": {
-                    "type": "string"
+                    "type": "email"
 
+                },
+                "date":{
+                    "type":"date"  
+                },
+                "post_id":{
+                    "type":"integer",
+                    "refrences":"posts"
                 }
             },
-            "mock_count":10
+            "mock_count":20
         },
         "posts": {
             "fields": {
@@ -38,12 +47,26 @@ schema = {
                 }
             },
             "mock_count":10
+        },
+        "mmd":{
+            "fields":{
+                "id":{
+                    "type":"integer",
+                    "primary_key":True
+                },
+                "name":{
+                    "type":"string",
+                },
+            },
+            "mock_count":0
         }
     }
 }
 
 
-parser = SchemaParser(schema).parse()
+parser = SchemaParser(schema)
+parser.register_field("email",EmailField)
+parser.parse()
 connection = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -51,12 +74,21 @@ connection = mysql.connector.connect(
     database="test",
     port = 3307
 )
+# print(connection.__repr__())
+# parser.get_table()
+# parser.register_field("date",BaseField)
 # print(connection.is_connected())
 ddl_generator = DDLGenerator(connection=connection,parser=parser)
+# print(ddl_generator.gen())
+ddl_generator.emit()
 # print(list(tables.keys()))
 # ddl_generator.emit()
-mocks = MockBuilder(parser=parser).build_sql_commands()
+mock_builder = MockBuilder(parser=parser)
+mocks = mock_builder.build_sql_commands()
 print(mocks)
+ddl_generator.emit(mocks)
+# mock_builder.register_mock_field(field_class=EmailField,fake_function=Faker().email)
+# print(mocks)
 # ddl_generator.emit(sql_command="".join(mocks))
 
 # print(SQLConvertor(parser).connection)

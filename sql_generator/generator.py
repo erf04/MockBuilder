@@ -2,7 +2,11 @@ from schema_parser.fields import IntegerField, StringField, DateField
 from schema_parser.table import Table
 from .base import SQLGenerator
 from mock_builder.builder import MockBuilder
+
 class DDLGenerator(SQLGenerator):
+
+    def __init__(self, connection, parser,*args,**kwargs):
+        super().__init__(connection, parser)
 
     def gen(self):
         sql_str = ""
@@ -21,17 +25,18 @@ class DDLGenerator(SQLGenerator):
         field_definitions = []
         for field_name, field_obj in table.fields.items():
             # Map custom fields to SQL types
-            sql_str = None
-            if isinstance(field_obj, IntegerField):
-                sql_type = "INT"
-                sql_pk = "AUTO_INCREMENT PRIMARY KEY" if field_obj.is_primary_key else ""
-                sql_str = f"{sql_type} {sql_pk}"
-            elif isinstance(field_obj, StringField):
-                sql_str = "TEXT"
-            elif isinstance(field_obj, DateField):
-                sql_str = "DATE"
-            else:
-                raise ValueError(f"Unsupported field type for {field_name}")
+            # if isinstance(field_obj, IntegerField):
+            #     sql_type = "INT"
+            #     sql_pk = "PRIMARY KEY" if field_obj.is_primary_key else ""
+            #     sql_str = f"{sql_type} {sql_pk}"
+            # elif isinstance(field_obj, StringField):
+            #     sql_str = "TEXT"
+            # elif isinstance(field_obj, DateField):
+            #     sql_str = "DATE"
+            # sql_type = SQL_FIELD_TYPE_MAPPING[field_obj.__class__]
+            sql_type = field_obj.get_sql_type()
+            sql_pk = "PRIMARY KEY" if field_obj.is_primary_key else ""
+            sql_str = f"{sql_type} {sql_pk}" if sql_pk else sql_type
 
             field_definitions.append(f"{field_name} {sql_str}")
 

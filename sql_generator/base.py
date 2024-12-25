@@ -6,7 +6,11 @@ class SQLGenerator:
         # self.table = table
         self.parser = parser
         self.connection = connection
-        self.cursor = connection.cursor()
+        try:
+            self.cursor = connection.cursor()
+        except:
+            raise ValueError(f"connection is type {type(self.connection)}. please pass a correct connection object to constructor")
+
 
 
     def emit(self,sql_command:str=None):
@@ -19,6 +23,9 @@ class SQLGenerator:
 
     def gen(self)->str:
         return NotImplementedError("Subclasses must implement this method.")
+    
+
+    # def register_field(self,field_name:str,field_class:BaseField) -> None:
     
     
 
