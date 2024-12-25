@@ -5,10 +5,13 @@ from mock_builder.builder import MockBuilder
 
 class DDLGenerator(SQLGenerator):
 
-    def __init__(self, connection, parser,*args,**kwargs):
-        super().__init__(connection, parser)
 
     def gen(self):
+        """
+        Generate the DDL commands to create all tables and their relations.
+
+        :return: The DDL commands as a string
+        """
         sql_str = ""
         for _,table_obj in self.parser.get_tables().items():
             sql_str += self.create_table(table_obj)
@@ -24,16 +27,6 @@ class DDLGenerator(SQLGenerator):
         """
         field_definitions = []
         for field_name, field_obj in table.fields.items():
-            # Map custom fields to SQL types
-            # if isinstance(field_obj, IntegerField):
-            #     sql_type = "INT"
-            #     sql_pk = "PRIMARY KEY" if field_obj.is_primary_key else ""
-            #     sql_str = f"{sql_type} {sql_pk}"
-            # elif isinstance(field_obj, StringField):
-            #     sql_str = "TEXT"
-            # elif isinstance(field_obj, DateField):
-            #     sql_str = "DATE"
-            # sql_type = SQL_FIELD_TYPE_MAPPING[field_obj.__class__]
             sql_type = field_obj.get_sql_type()
             sql_pk = "PRIMARY KEY" if field_obj.is_primary_key else ""
             sql_str = f"{sql_type} {sql_pk}" if sql_pk else sql_type
@@ -42,8 +35,8 @@ class DDLGenerator(SQLGenerator):
 
         # Join field definitions and construct the CREATE TABLE SQL
         fields_sql = ", ".join(field_definitions)
-        print(fields_sql)
-        return f"CREATE TABLE {table.name} ({fields_sql});"
+        # print(fields_sql)
+        return f"CREATE TABLE IF NOT EXISTS {table.name} ({fields_sql});"
     
 
     def handle_relations(self,table:Table):
@@ -58,21 +51,6 @@ class DDLGenerator(SQLGenerator):
         return sql_str
     
 
-
-class MockInsertGenerator(SQLGenerator):
-    def __init__(self, connection , mockBuilder:MockBuilder):
-        super.__init__(connection,mockBuilder.parser)
-        self.mock_builder = mockBuilder
-
-
-    def gen(self):
-        mocks = self.mock_builder.build()
-        sql_str = ""
-        for table_name,mock_data in mocks.items():
-            for mock in mock_data:
-                sql_str += f"INSERT INTO {table_name} VALUES ({','.join(mock)});"
-                # self.emit(sql_str)
-        return sql_str
 
 
 

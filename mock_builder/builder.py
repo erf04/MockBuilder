@@ -164,7 +164,7 @@ class MockBuilder:
         return final_data
     
 
-    def build_sql_commands(self):
+    def build_sql_string(self):
         self.build_non_fk_mock()
         self.update_for_fk_mock()
         final =""
@@ -174,6 +174,27 @@ class MockBuilder:
         for key,value in self._fk_dict.items():
             for sql_str in value:
                 final+=sql_str
+        return final
+    
+
+    def build_sql_file(self,folder_path:str=".") -> None:
+        sql_str = self.build_sql_string()
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        with open(f"{folder_path}/mock.sql", "w") as f:
+            f.write(sql_str)
+
+
+    def build_sql_commands_list(self) -> list[str]:
+        self.build_non_fk_mock()
+        self.update_for_fk_mock()
+        final =[]
+        for key,value in self._non_fk_dict.items():
+            for sql_str in value:
+                final.append(sql_str)
+        for key,value in self._fk_dict.items():
+            for sql_str in value:
+                final.append(sql_str)
         return final
     
 
