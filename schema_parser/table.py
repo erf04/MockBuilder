@@ -22,6 +22,8 @@ class Table:
             if field_obj.is_primary_key:
                 return field_name
             
+        raise ValueError(f"Table '{self.name}' does not have a primary key.")
+            
 
     def has_foreign_key(self):
         for field_name, field_obj in self.fields.items():

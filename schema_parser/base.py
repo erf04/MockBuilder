@@ -1,5 +1,5 @@
 class BaseField:
-    def __init__(self, name:str,primary_key:bool=False,refrences:str=None,**kwargs):
+    def __init__(self, name:str,primary_key:bool=False,refrences:str=None,nullable:bool=True,**kwargs):
         """
         Constructor shared by all fields.
         :param value: The value to be validated.
@@ -10,10 +10,7 @@ class BaseField:
         self.extra_args = kwargs
         self.is_primary_key = primary_key
         self.refrence = refrences
-
-    def validate(self,value) -> bool:
-        """Validation method to be overridden by child classes."""
-        raise NotImplementedError("Each field type must implement its own validate method.")
+        self.nullable = nullable
     
 
     def get_sql_type(self) -> str:
@@ -28,7 +25,12 @@ class BaseField:
 
     def get_sql_args(self) -> list[str]:
         """Returns the SQL arguments for the field."""
-        return ""
+        sql_args = []
+        if self.is_primary_key:
+            sql_args.append("PRIMARY KEY")
+        if not self.nullable:
+            sql_args.append("NOT NULL")
+        return sql_args
 
     
 

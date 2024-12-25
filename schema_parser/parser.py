@@ -2,8 +2,12 @@ from schema_parser.table import Table
 from schema_parser.mapper import FIELD_TYPE_MAPPING
 from schema_parser.base import BaseField
 from typing import Dict
+import yaml
+import xml.etree.ElementTree as ET
+import json
+
 class SchemaParser:
-    def __init__(self, schema:dict):
+    def __init__(self, schema):
         """
         .. highlight:: python
         Initialize a SchemaParser with a given schema.
@@ -22,6 +26,53 @@ class SchemaParser:
 
         self.schema:Dict[str,Dict[str]] = schema
         self._tables:Dict[str,Table] = {}
+
+
+    @classmethod
+    def from_dict(cls, schema_dict):
+        """Alternative constructor for creating an instance from a dictionary."""
+        return cls(schema_dict)
+
+    @classmethod
+    def from_yaml(cls, yaml_string):
+        """Alternative constructor for creating an instance from a YAML string."""
+        schema_dict = yaml.safe_load(yaml_string)
+        return cls(schema_dict)
+
+    @classmethod
+    def from_xml(cls, xml_string):
+        """Alternative constructor for creating an instance from an XML string."""
+        tree = ET.ElementTree(ET.fromstring(xml_string))
+        schema_dict = {elem.tag: elem.text for elem in tree.iter()}
+        return cls(schema_dict)
+
+    @classmethod
+    def from_json(cls, json_string):
+        """Alternative constructor for creating an instance from a JSON string."""
+        schema_dict = json.loads(json_string)
+        return cls(schema_dict)
+    
+
+    @classmethod
+    def from_json_file(cls, file_path):
+        """Alternative constructor for creating an instance from a JSON file."""
+        with open(file_path, 'r', encoding='utf-8') as f:
+            schema_dict = json.load(f)
+        return cls(schema_dict)
+
+    @classmethod
+    def from_yaml_file(cls, file_path):
+        """Alternative constructor for creating an instance from a YAML file."""
+        with open(file_path, 'r', encoding='utf-8') as f:
+            schema_dict = yaml.safe_load(f)
+        return cls(schema_dict)
+
+    @classmethod
+    def from_xml_file(cls, file_path):
+        """Alternative constructor for creating an instance from an XML file."""
+        tree = ET.parse(file_path)
+        schema_dict = {elem.tag: elem.text for elem in tree.iter()}
+        return cls(schema_dict)
 
 
     def parse(self):
@@ -72,7 +123,7 @@ class SchemaParser:
         return self._tables.get(table_name) if self._tables!={} else None
     
 
-    def register_field(self,field_name:str,field_class:BaseField) -> None:
+    def register_field_type(self,field_name:str,field_class:BaseField) -> None:
 
         """
         Register a custom field class with the parser.

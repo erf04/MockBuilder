@@ -1,0 +1,58 @@
+{
+    "tables": {
+        "users": {
+            "fields": {
+                "id": {
+                    "type": "integer",
+                    "primary_key": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "email"
+
+                },
+                "date":{
+                    "type":"date"  
+                },
+                "post_id":{
+                    "type":"integer",
+                    "refrences":"posts"
+                }
+            },
+            "mock_count":20
+        },
+        "posts": {
+            "fields": {
+                "id": {
+                    "type": "integer",
+                    "primary_key": true
+                },
+                "title": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "refrences": "users"
+                }
+            },
+            "mock_count":10
+        },
+        "mmd":{
+            "fields":{
+                "id":{
+                    "type":"integer",
+                    "primary_key":true
+                },
+                "name":{
+                    "type":"string"
+                }
+            },
+            "mock_count":5
+        }
+    }
+}

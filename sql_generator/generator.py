@@ -27,11 +27,8 @@ class DDLGenerator(SQLGenerator):
         """
         field_definitions = []
         for field_name, field_obj in table.fields.items():
-            sql_type = field_obj.get_sql_type()
-            sql_pk = "PRIMARY KEY" if field_obj.is_primary_key else ""
-            sql_str = f"{sql_type} {sql_pk}" if sql_pk else sql_type
-
-            field_definitions.append(f"{field_name} {sql_str}")
+            sql_args = field_obj.get_sql_args()
+            field_definitions.append(f"{field_name} {field_obj.get_sql_type()} {' '.join(sql_args)}")
 
         # Join field definitions and construct the CREATE TABLE SQL
         fields_sql = ", ".join(field_definitions)
