@@ -1,8 +1,6 @@
-from schema_parser.table import Table
-from faker import Faker
-from schema_parser import fields
-from schema_parser.base import BaseField
-from schema_parser.parser import SchemaParser
+from mocksql.scparse.table import Table
+from mocksql.scparse.base import BaseField
+from mocksql.parser import SchemaParser
 from typing import Dict,List
 import csv
 import os
@@ -28,7 +26,7 @@ class MockBuilder:
         return base_str
     
 
-    def get_pk(self,table:Table):
+    def get_last_pk(self,table:Table):
         last_pk = self._pk_dict.get(table.name)
         if not last_pk:
             last_pk =0 
@@ -36,47 +34,20 @@ class MockBuilder:
 
         return last_pk+1
 
-    def get_non_fk_values(self,table:Table):
+    def __get_non_fk_values(self,table:Table):
         values = []
         
         for field_name,field_obj in table.fields.items():
             if not field_obj.refrence:
                 if field_obj.is_primary_key:
-                    pk=self.get_pk(table=table)
+                    pk=self.get_last_pk(table=table)
                     values.append(str(pk))
                 else:
                     values.append(f"'{field_obj.fake()}'")
         return values
     
 
-    def get_fk_fields(self,table:Table):
-        fields = []
-        for field_name,field_obj in table.fields.items():
-            if field_obj.refrence:
-                fields.append(field_name)
-
-        return fields
-    
-
-    
-
-    def get_non_fk_fields(self,table:Table):
-        non_fk_fields = []
-        for field_name,field_obj in table.fields.items():
-            if not field_obj.refrence:
-                non_fk_fields.append(field_name)
-        return non_fk_fields
-    
-
-    def get_fk_fields(self,table:Table):
-        fk_fields = []
-        for field_name,field_obj in table.fields.items():
-            if field_obj.refrence:
-                fk_fields.append(field_name)
-        return fk_fields
-    
-
-    def get_fk_values(self,table:Table):
+    def __get_fk_values(self,table:Table):
         values = []
         for field_name,field_obj in table.fields.items():
             if field_obj.refrence:
@@ -113,25 +84,21 @@ class MockBuilder:
                 values.append(field_obj.fake())
         return values
     
-
-    
-
-
-    def build_fk_fields(self,table:Table,pk:int):
-        fk_fields = self.get_fk_fields(table)
-        if len(fk_fields) ==0:
+    def __build_fk_fields(self,table:Table,pk:int):
+        fk_fields = table.get_fk_fields()
+        if len(fk_fields) == 0:
             return ""
-        fk_values = self.get_fk_values(table=table)
+        fk_values = self.__get_fk_values(table=table)
         fk_zip = zip(fk_fields,fk_values)
         fk_list = [f"{field} = {value}" for field,value in fk_zip]
         return f"{self.get_base_update_sql(table=table)} SET {','.join(fk_list)} WHERE {table.get_primary_key()} = {pk};"
         # return values
 
-    def build_non_fk_fields(self,table:Table):
-        fk_fields = self.get_non_fk_fields(table)
+    def __build_non_fk_fields(self,table:Table):
+        fk_fields = table.get_non_fk_fields()
         if len(fk_fields) ==0:
             return ""
-        fk_values = self.get_non_fk_values(table=table)
+        fk_values = self.__get_non_fk_values(table=table)
         return f"{self.get_base_insert_sql(table=table)} ({','.join(fk_fields)}) VALUES ({','.join(fk_values)});"
         # return values
 
@@ -142,31 +109,33 @@ class MockBuilder:
                 for _ in range(table_obj.mock_count):
                     value = final_data.get(table_obj.name)
                     if value:
-                        value.append(self.build_non_fk_fields(table_obj))
+                        value.append(self.__build_non_fk_fields(table_obj))
                     else:
-                        final_data[table_obj.name] = [self.build_non_fk_fields(table_obj)]
+                        final_data[table_obj.name] = [self.__build_non_fk_fields(table_obj)]
         self._non_fk_dict = final_data
         return self
     
 
-    def update_for_fk_mock(self) -> Dict[str,list[list[str]]]:
+    def __update_for_fk_mock(self) -> Dict[str,list[list[str]]]:
         final_data:Dict[str,List[str]] = {}
         for _,table_obj in self.parser._tables.items():
             if table_obj.has_foreign_key():
                 if table_obj.mock_count > 0:
                     for pk in range(1,table_obj.mock_count+1):
                         value = final_data.get(table_obj.name)
+                        fk_build = self.__build_fk_fields(table_obj,pk)
+
                         if value:
-                            value.append(self.build_fk_fields(table_obj,pk))
+                            value.append(fk_build)
                         else:
-                            final_data[table_obj.name] = [self.build_fk_fields(table_obj,pk)]
+                            final_data[table_obj.name] = [fk_build]
         self._fk_dict = final_data
         return final_data
     
 
     def build_sql_string(self):
         self.build_non_fk_mock()
-        self.update_for_fk_mock()
+        self.__update_for_fk_mock()
         final =""
         for key,value in self._non_fk_dict.items():
             for sql_str in value:
@@ -186,16 +155,7 @@ class MockBuilder:
 
 
     def build_sql_commands_list(self) -> list[str]:
-        self.build_non_fk_mock()
-        self.update_for_fk_mock()
-        final =[]
-        for key,value in self._non_fk_dict.items():
-            for sql_str in value:
-                final.append(sql_str)
-        for key,value in self._fk_dict.items():
-            for sql_str in value:
-                final.append(sql_str)
-        return final
+        return self.build_sql_string().split(";")
     
 
     def build_csv(self,folder_path:str=".") -> None:

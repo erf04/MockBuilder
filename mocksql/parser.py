@@ -1,12 +1,26 @@
-from schema_parser.table import Table
-from schema_parser.mapper import FIELD_TYPE_MAPPING
-from schema_parser.base import BaseField
+from mocksql.scparse.table import Table
+from mocksql.scparse.fields import *
+from mocksql.scparse.base import BaseField
 from typing import Dict
 import yaml
 import xml.etree.ElementTree as ET
 import json
 
 class SchemaParser:
+
+
+    __FIELD_TYPE_MAPPING={
+        "string": StringField,
+        "str":StringField,
+        "int":IntegerField,
+        "integer": IntegerField,
+        "boolean": BooleanField,
+        "bool":BooleanField,
+        "datetime": DateTimeField,
+        "date": DateField
+    }
+
+
     def __init__(self, schema):
         """
         .. highlight:: python
@@ -86,7 +100,7 @@ class SchemaParser:
                 if not field_type:
                     raise ValueError(f"Field '{field_name}' in table '{table_name}' is missing a type.")
 
-                field_class = FIELD_TYPE_MAPPING.get(field_type)
+                field_class = self.__FIELD_TYPE_MAPPING.get(field_type)
                 if not field_class:
                     raise ValueError(f"Unknown field type '{field_type}' in table '{table_name}'.Have you registered the field {field_type}?")
 
@@ -133,5 +147,5 @@ class SchemaParser:
         :type field_class : BaseField
         :return: None
         """
-        FIELD_TYPE_MAPPING[field_name] = field_class
+        self.__FIELD_TYPE_MAPPING[field_name] = field_class
     

@@ -1,7 +1,6 @@
-from schema_parser.fields import IntegerField, StringField, DateField
-from schema_parser.table import Table
-from .base import SQLGenerator
-from mock_builder.builder import MockBuilder
+from mocksql.scparse.table import Table
+from mocksql.sql_generator.base import SQLGenerator
+from mocksql.builder import MockBuilder
 
 class DDLGenerator(SQLGenerator):
 
