@@ -4,9 +4,10 @@ import mysql.connector
 from mocksql.builder import MockBuilder
 from mocksql.scparse.fields import EmailField
 from faker import Faker
-from mocksql.emitter import MySQLEmitter
+from mocksql.emitter import MySQLEmitter,PostgresEmitter
+import psycopg2
 
-parser = SchemaParser.from_yaml_file("schema.yaml")
+parser = SchemaParser.from_json_file("schema.json")
 # print(parser)
 parser.register_field_type("email",EmailField)
 parser.parse()
@@ -17,6 +18,12 @@ parser.parse()
 #     database="test",
 #     port = 3307
 # )
+connection = psycopg2.connect(
+    host = "localhost",
+    database = "test",
+    user = "postgres",
+    password = "koala04"
+)
 # print(connection.__repr__())
 # parser.get_table()
 # parser.register_field("date",BaseField)
@@ -28,6 +35,8 @@ ddl_generator = DDLGenerator(parser=parser)
 # emitter.emit_all(ddl_generator.gen())
 # print(list(tables.keys()))
 # ddl_generator.emit()
+emitter = PostgresEmitter(connection=connection)
+emitter.emit_all(ddl_generator.gen())
 
 mock_builder = MockBuilder(parser=parser)
 mocks = mock_builder.build_sql_commands_list()

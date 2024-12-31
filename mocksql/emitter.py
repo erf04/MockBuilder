@@ -32,3 +32,23 @@ class MySQLEmitter(Emitter):
     def __init__(self, connection):
         super().__init__(connection)# Call the constructor of the parent class
 
+
+class PostgresEmitter(Emitter):
+    def __init__(self, connection):
+        super().__init__(connection)# Call the constructor of the parent class
+
+    def emit_all(self, sql_commands):
+        sql_list = sql_commands.split(";")
+        for sql_command in sql_list:
+            self.cursor.execute(sql_command)
+
+
+    def emit_one(self, sql_command):
+        return self.cursor.execute(sql_command)
+    
+
+    def emit_array_of_commands(self, sql_commands):
+        for sql_command in sql_commands:
+            if sql_command!="":
+                self.cursor.execute(sql_command)
+

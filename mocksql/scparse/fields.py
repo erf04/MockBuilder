@@ -76,7 +76,7 @@ class DateField(BaseField):
 class EmailField(StringField):
     
     def get_sql_type(self):
-        return "NVARCHAR(255)"
+        return "VARCHAR(255)"
     def fake(self,**kwargs):
         return Faker().email(**kwargs)  
 
