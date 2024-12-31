@@ -4,75 +4,18 @@ import mysql.connector
 from mock_builder.builder import MockBuilder
 from schema_parser.fields import EmailField
 from faker import Faker
-schema = {
-    "tables": {
-        "users": {
-            "fields": {
-                "id": {
-                    "type": "integer",
-                    "primary_key": True
-                },
-                "name": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "email"
-
-                },
-                "date":{
-                    "type":"date"  
-                },
-                "post_id":{
-                    "type":"integer",
-                    "refrences":"posts"
-                }
-            },
-            "mock_count":20
-        },
-        "posts": {
-            "fields": {
-                "id": {
-                    "type": "integer",
-                    "primary_key": True
-                },
-                "title": {
-                    "type": "string"
-                },
-                "content": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "integer",
-                    "refrences": "users"
-                }
-            },
-            "mock_count":10
-        },
-        "mmd":{
-            "fields":{
-                "id":{
-                    "type":"integer",
-                    "primary_key":True
-                },
-                "name":{
-                    "type":"string",
-                },
-            },
-            "mock_count":0
-        }
-    }
-}
 
 
-parser = SchemaParser(schema)
+
+parser = SchemaParser.fr
 parser.register_field("email",EmailField)
 parser.parse()
 connection = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="1234",
-    database="test",
-    port = 3307
+    password="1383Aram",
+    database="library",
+    port = 3306
 )
 # print(connection.__repr__())
 # parser.get_table()
