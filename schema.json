@@ -1,58 +1,161 @@
 {
-    "tables": {
-        "users": {
-            "fields": {
-                "id": {
-                    "type": "integer",
-                    "primary_key": true
-                },
-                "name": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "email"
-
-                },
-                "date":{
-                    "type":"date"  
-                },
-                "post_id":{
+    "tables":{
+        "users":{
+            "fields":{
+                "user_id":{
                     "type":"integer",
-                    "refrences":"posts"
-                }
-            },
-            "mock_count":20
-        },
-        "posts": {
-            "fields": {
-                "id": {
-                    "type": "integer",
                     "primary_key": true
                 },
-                "title": {
+                "name":{
                     "type": "string"
                 },
-                "content": {
-                    "type": "string"
+                "email":{
+                    "type":"string"
                 },
-                "user_id": {
-                    "type": "integer",
-                    "refrences": "users"
+                "phone_number":{
+                    "type":"string"
+                },
+                "registration_date":{
+                    "type":"date"
                 }
             },
             "mock_count":10
         },
-        "mmd":{
+        "loan":{
             "fields":{
-                "id":{
+                "loan_id":{
+                    "type":"integer",
+                    "primary_key": true
+                },
+                "user_id":{
+                    "type":"integer",
+                    "refrences":"users"
+                },
+                "book_id":{
+                    "type":"integer",
+                    "refrences":"book"
+                },
+                "loan_date":{
+                    "type":"date"
+                },
+                "return_date":{
+                    "type":"date"
+                }
+            },
+            "mock_count":10
+        },
+        "review":{
+            "fields":{
+                "review_id":{
+                    "type":"integer",
+                    "primary_key": true
+                },
+                "user_id":{
+                    "type":"integer",
+                    "refrences":"users"
+                },
+                "book_id":{
+                    "type":"integer",
+                    "refrences":"book"
+                },
+                "rating":{
+                    "type":"integer"
+                },
+                "review_text":{
+                    "type":"string"
+                },
+                "review_date":{
+                    "type":"date"
+                }
+            },
+            "mock_count":10
+        },
+        "book":{
+            "fields":{
+                "book_id":{
+                    "type":"integer",
+                    "primary_key":true
+                },
+                "title":{
+                    "type":"string"
+                },
+                "author":{
+                    "type":"string"
+                },
+                "genre":{
+                    "type":"string"
+                },
+                "publication_year":{
+                    "type":"integer"
+                }
+            },
+            "mock_count":10
+        },
+        "bookAuthor":{
+            "fields":{
+                "bookAuthor_id":{
+                    "type":"integer",
+                    "primary_key":true
+                },
+                "book_id":{
+                    "type":"integer",
+                    "refrences":"book"
+                },
+                "author_id":{
+                    "type":"integer",
+                    "refrences":"author"
+                }
+            },
+            "mock_count":10
+        },
+        "author":{
+            "fields":{
+                "author_id":{
                     "type":"integer",
                     "primary_key":true
                 },
                 "name":{
                     "type":"string"
+                },
+                "bio":{
+                    "type":"string"
                 }
             },
-            "mock_count":5
+            "mock_count":10
+        },
+        "publisher":{
+            "fields":{
+                "publisher_id":{
+                    "type":"integer",
+                    "primary_key":true
+                },
+                "name":{
+                    "type":"string"
+                },
+                "address":{
+                    "type":"string"
+                }
+            },
+            "mock_count":10
+        },
+        "bookPublisher":{
+            "fields":{
+                "bookPublisher_id":{
+                    "type":"integer",
+                    "primary_key":true
+                },
+                "book_id":{
+                    "type":"integer",
+                    "refrences":"book"
+                },
+                "publisher_id":{
+                    "type":"integer",
+                    "refrences":"publisher"
+                }
+            },
+            "mock_count":10
         }
+
     }
 }
+

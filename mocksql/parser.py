@@ -112,6 +112,7 @@ class SchemaParser:
                 fields[field_name] = field_object
             kwargs = {k: v for k, v in table_data.items() if k != "fields"}
             # Instantiate the table
+            # print(kwargs)
             self._tables[table_name] = Table(name=table_name, fields=fields,parser=self,**kwargs)
             
 

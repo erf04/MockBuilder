@@ -38,10 +38,12 @@ class DDLGenerator(SQLGenerator):
     def handle_relations(self,table:Table):
         sql_str = ""
         # print(self.table.fields)
+        
         for field_name, field_obj in table.fields.items():
             if field_obj.refrence!=None:
+                # print("this line ", field_obj,field_obj.refrence)
                 refrence_table:Table = self.parser.get_table(field_obj.refrence)
-                related_field = table.get_primary_key()
+                related_field = refrence_table.get_primary_key()
                 sql_str += f"ALTER TABLE {table.name} ADD FOREIGN KEY ({field_name}) REFERENCES {refrence_table.name}({related_field});"
     
         return sql_str
