@@ -1,0 +1,36 @@
+
+tables:
+  users:
+    mock_count: 10
+    fields:
+      id:
+        type: "integer"
+        # primary_key: true
+        nullable: false
+      name:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+        nullable : false
+      date:
+        type: "date"
+      # post_id:
+      #   type: "integer"
+      #   refrences: "posts"
+
+  posts:
+    mock_count: 100
+    fields:
+      id:
+        type: "integer"
+        primary_key: true
+      title:
+        type: "string"
+      content:
+        type: "string"
+      user_id:
+        type: "integer"
+        refrences: "users"
+

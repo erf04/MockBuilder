@@ -1,6 +1,6 @@
 {
     "tables":{
-        "user":{
+        "users":{
             "fields":{
                 "user_id":{
                     "type":"integer",
@@ -29,7 +29,7 @@
                 },
                 "user_id":{
                     "type":"integer",
-                    "refrences":"user"
+                    "refrences":"users"
                 },
                 "book_id":{
                     "type":"integer",
@@ -52,7 +52,7 @@
                 },
                 "user_id":{
                     "type":"integer",
-                    "refrences":"user"
+                    "refrences":"users"
                 },
                 "book_id":{
                     "type":"integer",
@@ -92,7 +92,11 @@
             "mock_count":10
         },
         "bookAuthor":{
-            "fileds":{
+            "fields":{
+                "bookAuthor_id":{
+                    "type":"integer",
+                    "primary_key":true
+                },
                 "book_id":{
                     "type":"integer",
                     "refrences":"book"
@@ -136,6 +140,10 @@
         },
         "bookPublisher":{
             "fields":{
+                "bookPublisher_id":{
+                    "type":"integer",
+                    "primary_key":true
+                },
                 "book_id":{
                     "type":"integer",
                     "refrences":"book"
@@ -150,3 +158,4 @@
 
     }
 }
+

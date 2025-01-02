@@ -1,0 +1,11 @@
+review_id,user_id,book_id,rating,review_text,review_date
+1,6,5,3792,Shelly Burns,2011-12-10
+2,5,3,1692,Shirley Finley,2010-11-24
+3,9,8,7014,Brandy Martinez,2008-07-06
+4,3,4,5950,Jeffrey Horton,1977-06-09
+5,6,2,9558,Johnny George,1985-04-21
+6,9,8,5946,Melissa Smith,1987-08-11
+7,9,1,5259,Anne Price,2021-10-02
+8,6,2,5032,Brooke Scott,1992-12-03
+9,7,10,3925,Antonio Haney,1996-06-26
+10,8,3,1962,Amanda Gilbert,1974-11-12
